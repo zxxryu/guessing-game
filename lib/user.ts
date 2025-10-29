@@ -1,0 +1,30 @@
+// User ID management using localStorage
+const USER_ID_KEY = "guessing-game-user-id"
+const USER_NAME_KEY = "guessing-game-user-name"
+
+export function getUserId(): string {
+  if (typeof window === "undefined") return ""
+
+  let userId = localStorage.getItem(USER_ID_KEY)
+  if (!userId) {
+    userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    localStorage.setItem(USER_ID_KEY, userId)
+  }
+  return userId
+}
+
+export function getUserName(): string {
+  if (typeof window === "undefined") return ""
+
+  let userName = localStorage.getItem(USER_NAME_KEY)
+  if (!userName) {
+    userName = `Player${Math.floor(Math.random() * 9999)}`
+    localStorage.setItem(USER_NAME_KEY, userName)
+  }
+  return userName
+}
+
+export function setUserName(name: string): void {
+  if (typeof window === "undefined") return
+  localStorage.setItem(USER_NAME_KEY, name)
+}
