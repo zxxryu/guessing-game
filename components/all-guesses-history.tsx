@@ -1,9 +1,11 @@
-"use client"
+'use client'
 
-import { Badge } from "@/components/ui/badge"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import type { Guess } from "@/lib/types"
-import { CheckCircle2, Circle, Clock } from "lucide-react"
+import { CheckCircle2, Circle, Clock } from 'lucide-react'
+
+import type { Guess } from '@/lib/types'
+
+import { Badge } from '@/components/ui/badge'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 interface AllGuessesHistoryProps {
   allGuesses: Guess[]
@@ -16,19 +18,19 @@ export function AllGuessesHistory({ allGuesses, currentUserId, targetDigits }: A
 
   const formatTime = (timestamp: number) => {
     const date = new Date(timestamp)
-    return date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
       hour12: false,
     })
   }
 
   const formatNumber = (guess: Guess) => {
     if (guess.playerId !== currentUserId) {
-      return "*".repeat(targetDigits)
+      return '*'.repeat(targetDigits)
     }
-    return guess.number.toString().padStart(targetDigits, "0")
+    return guess.number.toString().padStart(targetDigits, '0')
   }
 
   return (
@@ -59,9 +61,9 @@ export function AllGuessesHistory({ allGuesses, currentUserId, targetDigits }: A
                         #{guessNumber}
                       </Badge>
                       <span
-                        className={`text-sm font-medium ${isCurrentUser ? "text-primary" : "text-muted-foreground"}`}
+                        className={`text-sm font-medium ${isCurrentUser ? 'text-primary' : 'text-muted-foreground'}`}
                       >
-                        {isCurrentUser ? "You" : guess.playerName}
+                        {isCurrentUser ? 'You' : guess.playerName}
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -72,7 +74,7 @@ export function AllGuessesHistory({ allGuesses, currentUserId, targetDigits }: A
 
                   <div className="flex items-center justify-between">
                     <span
-                      className={`text-2xl font-bold font-mono tracking-wider ${isCurrentUser ? "" : "text-muted-foreground"}`}
+                      className={`text-2xl font-bold font-mono tracking-wider ${isCurrentUser ? '' : 'text-muted-foreground'}`}
                     >
                       {formatNumber(guess)}
                     </span>

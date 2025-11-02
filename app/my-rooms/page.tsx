@@ -1,15 +1,17 @@
-"use client"
+'use client'
 
-import type React from "react"
+import { Users, Lock, Copy, ChevronRight, Gamepad2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState, useCallback } from 'react'
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { useUser } from "@/contexts/user-context"
-import type { Room } from "@/lib/types"
-import { Users, Lock, Copy, ChevronRight, Gamepad2 } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
+import type { Room } from '@/lib/types'
+import type React from 'react'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { useUser } from '@/contexts/user-context'
+import { useToast } from '@/hooks/use-toast'
+import { api } from '@/lib/api'
 
 export default function MyRoomsPage() {
   const [rooms, setRooms] = useState<Room[]>([])
@@ -18,32 +20,32 @@ export default function MyRoomsPage() {
   const router = useRouter()
   const { toast } = useToast()
 
+  const fetchRooms = useCallback(async () => {
+    try {
+      const rooms: Room[] = await api.listRooms(undefined, userId)
+      setRooms(rooms)
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to fetch my rooms',
+        variant: 'destructive',
+      })
+    } finally {
+      setLoading(false)
+    }
+  }, [userId, toast])
+
   useEffect(() => {
     if (!userId) return
-
-    const fetchMyRooms = async () => {
-      try {
-        const response = await fetch(`/api/rooms/user/${userId}`)
-        const data = await response.json()
-        setRooms(data.rooms || [])
-      } catch (error) {
-        console.error("Failed to fetch rooms:", error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchMyRooms()
-    const interval = setInterval(fetchMyRooms, 5000)
-    return () => clearInterval(interval)
-  }, [userId])
+    fetchRooms()
+  }, [fetchRooms, userId])
 
   const handleCopyRoomId = (roomId: string, e: React.MouseEvent) => {
     e.stopPropagation()
     navigator.clipboard.writeText(roomId)
     toast({
-      title: "Copied!",
-      description: "Room ID copied to clipboard",
+      title: 'Copied!',
+      description: 'Room ID copied to clipboard',
     })
   }
 
@@ -52,8 +54,8 @@ export default function MyRoomsPage() {
     const shareLink = `${window.location.origin}/room/${roomId}`
     navigator.clipboard.writeText(shareLink)
     toast({
-      title: "Copied!",
-      description: "Share link copied to clipboard",
+      title: 'Copied!',
+      description: 'Share link copied to clipboard',
     })
   }
 
@@ -77,7 +79,7 @@ export default function MyRoomsPage() {
             </div>
             <p className="text-lg font-medium mb-2">No rooms yet</p>
             <p className="text-muted-foreground mb-6">Create your first game room</p>
-            <Button onClick={() => router.push("/create")} size="lg" className="rounded-full">
+            <Button onClick={() => router.push('/create')} size="lg" className="rounded-full">
               Create Room
             </Button>
           </div>

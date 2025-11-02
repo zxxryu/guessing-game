@@ -1,20 +1,20 @@
-"use client"
+'use client'
 
-import { usePathname, useRouter } from "next/navigation"
-import { Home, Plus, FolderOpen } from "lucide-react"
+import { Home, Plus, FolderOpen } from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
 
 export function IOSNav() {
   const pathname = usePathname()
   const router = useRouter()
 
-  if (pathname.startsWith("/room/")) {
+  if (pathname.startsWith('/room/')) {
     return null
   }
 
   const navItems = [
-    { icon: Home, label: "Home", path: "/" },
-    { icon: Plus, label: "Create", path: "/create" },
-    { icon: FolderOpen, label: "My Rooms", path: "/my-rooms" },
+    { icon: Home, label: 'Home', path: '/' },
+    { icon: Plus, label: 'Create', path: '/create' },
+    { icon: FolderOpen, label: 'My Rooms', path: '/my-rooms' },
   ]
 
   return (
@@ -35,15 +35,15 @@ export function IOSNav() {
                   <div
                     className={`flex items-center justify-center w-12 h-12 rounded-2xl ios-transition ${
                       isActive
-                        ? "bg-primary text-primary-foreground scale-105"
-                        : "text-muted-foreground hover:bg-secondary"
+                        ? 'bg-primary text-primary-foreground scale-105'
+                        : 'text-muted-foreground hover:bg-secondary'
                     }`}
                   >
                     <Icon className="h-6 w-6" />
                   </div>
                   <span
                     className={`text-xs font-medium ios-transition ${
-                      isActive ? "text-primary" : "text-muted-foreground"
+                      isActive ? 'text-primary' : 'text-muted-foreground'
                     }`}
                   >
                     {item.label}

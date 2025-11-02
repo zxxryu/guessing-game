@@ -1,9 +1,11 @@
-"use client"
+'use client'
 
-import { Badge } from "@/components/ui/badge"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import type { Guess } from "@/lib/types"
-import { CheckCircle2, Circle } from "lucide-react"
+import { CheckCircle2, Circle } from 'lucide-react'
+
+import type { Guess } from '@/lib/types'
+
+import { Badge } from '@/components/ui/badge'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 interface GuessHistoryProps {
   guesses: Guess[]
@@ -32,7 +34,7 @@ export function GuessHistory({ guesses, playerName }: GuessHistoryProps) {
                 className="flex items-center justify-between p-4 rounded-2xl bg-secondary/20 ios-transition hover:bg-secondary/30"
               >
                 <span className="text-3xl font-bold font-mono tracking-wider">
-                  {guess.number.toString().padStart(4, "0")}
+                  {guess.number.toString().padStart(4, '0')}
                 </span>
                 <div className="flex items-center gap-2">
                   <Badge variant="secondary" className="flex items-center gap-1.5 rounded-full px-3 py-1.5">

@@ -1,11 +1,12 @@
-"use client"
+'use client'
 
-import type React from "react"
+import { Send, Circle, CheckCircle2 } from 'lucide-react'
+import { useState } from 'react'
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { VerificationInput } from "@/components/verification-input"
-import { Send, Circle, CheckCircle2 } from "lucide-react"
+import type React from 'react'
+
+import { Button } from '@/components/ui/button'
+import { VerificationInput } from '@/components/verification-input'
 
 interface GuessInputProps {
   onGuess: (number: string) => void
@@ -14,7 +15,7 @@ interface GuessInputProps {
 }
 
 export function GuessInput({ onGuess, disabled, digits = 4 }: GuessInputProps) {
-  const [guess, setGuess] = useState("")
+  const [guess, setGuess] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -24,7 +25,7 @@ export function GuessInput({ onGuess, disabled, digits = 4 }: GuessInputProps) {
     }
 
     onGuess(guess)
-    setGuess("")
+    setGuess('')
   }
 
   return (

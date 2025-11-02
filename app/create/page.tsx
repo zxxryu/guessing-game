@@ -1,28 +1,30 @@
-"use client"
+'use client'
 
-import type React from "react"
+import { Plus, Users, Lock, Shuffle, Key } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { useUser } from "@/contexts/user-context"
-import { useToast } from "@/hooks/use-toast"
-import { Plus, Users, Lock, Shuffle, Key } from "lucide-react"
-import type { CreateRoomRequest } from "@/lib/types"
+import type { CreateRoomRequest } from '@/lib/types'
+import type React from 'react'
+
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
+import { useUser } from '@/contexts/user-context'
+import { useToast } from '@/hooks/use-toast'
+import { api } from '@/lib/api'
 
 export default function CreateRoomPage() {
-  const [roomName, setRoomName] = useState("")
+  const [roomName, setRoomName] = useState('')
   const [isPublic, setIsPublic] = useState(true)
-  const [password, setPassword] = useState("")
-  const [targetNumberType, setTargetNumberType] = useState<"fixed" | "random">("fixed")
-  const [targetNumber, setTargetNumber] = useState("")
+  const [password, setPassword] = useState('')
+  const [targetNumberType, setTargetNumberType] = useState<'fixed' | 'random'>('fixed')
+  const [targetNumber, setTargetNumber] = useState('')
   const [targetDigits, setTargetDigits] = useState(4)
   const [maxPlayers, setMaxPlayers] = useState(4)
   const [loading, setLoading] = useState(false)
-  const { userId, userName } = useUser()
+  const { userId, userName, setUserRoomPassword } = useUser()
   const router = useRouter()
   const { toast } = useToast()
 
@@ -31,9 +33,9 @@ export default function CreateRoomPage() {
 
     if (!roomName.trim()) {
       toast({
-        title: "Error",
-        description: "Please enter a room name",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Please enter a room name',
+        variant: 'destructive',
       })
       return
     }
@@ -41,46 +43,46 @@ export default function CreateRoomPage() {
     if (!isPublic) {
       if (!password.trim()) {
         toast({
-          title: "Error",
-          description: "Please enter a password",
-          variant: "destructive",
+          title: 'Error',
+          description: 'Please enter a password',
+          variant: 'destructive',
         })
         return
       }
     } else {
-      setPassword("")
+      setPassword('')
     }
 
-    if (targetNumberType === "fixed" && !targetNumber.trim()) { 
+    if (targetNumberType === 'fixed' && !targetNumber.trim()) { 
       toast({
-        title: "Error",
-        description: "Please enter a target number",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Please enter a target number',
+        variant: 'destructive',
       })
       return
     }
-    if (targetNumberType === "fixed" && (targetNumber.length < 4 || targetNumber.length > 6)) {
+    if (targetNumberType === 'fixed' && (targetNumber.length < 4 || targetNumber.length > 6)) {
       toast({
-        title: "Error",
-        description: "Target number must be 4-6 digits",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Target number must be 4-6 digits',
+        variant: 'destructive',
       })
       return
     }
-    if (targetNumberType === "fixed" && !/^\d+$/.test(targetNumber)) {
+    if (targetNumberType === 'fixed' && !/^\d+$/.test(targetNumber)) {
       toast({
-        title: "Error",
-        description: "Target number must contain only numbers",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Target number must contain only numbers',
+        variant: 'destructive',
       })
       return
     }
 
     if (maxPlayers < 2 || maxPlayers > 10) {
       toast({
-        title: "Error",
-        description: "Max players must be between 2 and 10",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Max players must be between 2 and 10',
+        variant: 'destructive',
       })
       return
     }
@@ -91,12 +93,12 @@ export default function CreateRoomPage() {
       let finalTargetNumber = targetNumber
       let finalTargetDigits = targetDigits
 
-      if (targetNumberType === "random") {
+      if (targetNumberType === 'random') {
         const min = Math.pow(10, targetDigits - 1)
         const max = Math.pow(10, targetDigits) - 1
         finalTargetNumber = Math.floor(Math.random() * (max - min + 1) + min).toString()
         finalTargetDigits = targetDigits
-      } else if (targetNumberType === "fixed") {
+      } else if (targetNumberType === 'fixed') {
         finalTargetDigits = targetNumber.length
       }
 
@@ -112,41 +114,33 @@ export default function CreateRoomPage() {
         creatorName: userName,
       }
 
-      console.log(requestBody)
+      const room = await api.createRoom(requestBody)
 
-      const response = await fetch("/api/rooms", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody),
+      toast({
+        title: 'Room created!',
+        description: 'Redirecting to your room...',
       })
 
-      if (!response.ok) {
-        throw new Error("Failed to create room")
+      if (!isPublic) {
+        setUserRoomPassword(room.id, password)
       }
 
-      const data = await response.json()
-
-      toast({
-        title: "Room created!",
-        description: "Redirecting to your room...",
-      })
-
-      router.push(`/room/${data.roomId}`)
+      router.push(`/room/${room.id}`)
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to create room",
-        variant: "destructive",
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to create room',
+        variant: 'destructive',
       })
     } finally {
       setLoading(false)
     }
   }
 
-  const handleTargetNumberTypeChange = (type: "fixed" | "random") => {
+  const handleTargetNumberTypeChange = (type: 'fixed' | 'random') => {
     setTargetNumberType(type)
-    if (type === "fixed") {
-      setTargetNumber("")
+    if (type === 'fixed') {
+      setTargetNumber('')
     }
   }
 
@@ -185,11 +179,11 @@ export default function CreateRoomPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
-                    onClick={() => handleTargetNumberTypeChange("fixed")}
+                    onClick={() => handleTargetNumberTypeChange('fixed')}
                     className={`ios-card rounded-2xl p-4 border-2 transition-all ${
-                      targetNumberType === "fixed"
-                        ? "border-primary bg-primary/5"
-                        : "border-border/50 hover:border-border"
+                      targetNumberType === 'fixed'
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border/50 hover:border-border'
                     }`}
                   >
                     <Key className="h-5 w-5 mb-2 mx-auto" />
@@ -198,11 +192,11 @@ export default function CreateRoomPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => handleTargetNumberTypeChange("random")}
+                    onClick={() => handleTargetNumberTypeChange('random')}
                     className={`ios-card rounded-2xl p-4 border-2 transition-all ${
-                      targetNumberType === "random"
-                        ? "border-primary bg-primary/5"
-                        : "border-border/50 hover:border-border"
+                      targetNumberType === 'random'
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border/50 hover:border-border'
                     }`}
                   >
                     <Shuffle className="h-5 w-5 mb-2 mx-auto" />
@@ -213,7 +207,7 @@ export default function CreateRoomPage() {
               </div>
 
               {/* Fixed Target Number Input */}
-              {targetNumberType === "fixed" && (
+              {targetNumberType === 'fixed' && (
                 <div className="space-y-3">
                   <Label htmlFor="targetNumber" className="text-base font-semibold">
                     Target Number (4-6 digits)
@@ -225,7 +219,7 @@ export default function CreateRoomPage() {
                     placeholder="Enter 4-6 digit target number"
                     value={targetNumber}
                     onChange={(e) => {
-                      const value = e.target.value.replace(/\D/g, "").slice(0, 6)
+                      const value = e.target.value.replace(/\D/g, '').slice(0, 6)
                       setTargetNumber(value)
                     }}
                     className="h-12 rounded-xl text-base font-mono tracking-wider text-center"
@@ -235,7 +229,7 @@ export default function CreateRoomPage() {
               )}
 
               {/* Random Target Number Digits Selection */}
-              {targetNumberType === "random" && (
+              {targetNumberType === 'random' && (
                 <div className="space-y-3">
                   <Label className="text-base font-semibold">Target Number Length</Label>
                   <div className="flex gap-3">
@@ -246,8 +240,8 @@ export default function CreateRoomPage() {
                         onClick={() => setTargetDigits(digits)}
                         className={`flex-1 ios-card rounded-xl p-4 border-2 transition-all ${
                           targetDigits === digits
-                            ? "border-primary bg-primary/5"
-                            : "border-border/50 hover:border-border"
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border/50 hover:border-border'
                         }`}
                       >
                         <div className="text-2xl font-bold">{digits}</div>
@@ -270,7 +264,7 @@ export default function CreateRoomPage() {
                     Public Room
                   </Label>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    {isPublic ? "Anyone can see and join this room" : "Only people with the password can join"}
+                    {isPublic ? 'Anyone can see and join this room' : 'Only people with the password can join'}
                   </p>
                 </div>
                 <Switch id="isPublic" checked={isPublic} onCheckedChange={setIsPublic} />
@@ -328,7 +322,7 @@ export default function CreateRoomPage() {
               disabled={loading}
             >
               <Plus className="h-5 w-5 mr-2" />
-              {loading ? "Creating..." : "Create Room"}
+              {loading ? 'Creating...' : 'Create Room'}
             </Button>
           </form>
         </div>

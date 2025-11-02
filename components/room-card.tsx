@@ -1,8 +1,10 @@
-"use client"
-import { Badge } from "@/components/ui/badge"
-import { Users, Lock, ChevronRight } from "lucide-react"
-import type { Room } from "@/lib/types"
-import { useRouter } from "next/navigation"
+'use client'
+import { Users, Lock, ChevronRight } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+
+import type { Room } from '@/lib/types'
+
+import { Badge } from '@/components/ui/badge'
 
 interface RoomCardProps {
   room: Room
@@ -40,8 +42,8 @@ export function RoomCard({ room }: RoomCardProps) {
       </div>
 
       <div className="flex items-center justify-between gap-2">
-        <Badge variant={isFull ? "secondary" : "default"} className="rounded-full px-3 py-1">
-          {isFull ? "Full" : "Open"}
+        <Badge variant={isFull ? 'secondary' : 'default'} className="rounded-full px-3 py-1">
+          {isFull ? 'Full' : 'Open'}
         </Badge>
         <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
           <ChevronRight className="h-5 w-5 text-primary" />

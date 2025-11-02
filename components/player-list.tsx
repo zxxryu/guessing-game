@@ -1,9 +1,11 @@
-"use client"
+'use client'
 
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Crown, Trophy } from "lucide-react"
-import type { Player } from "@/lib/types"
+import { Crown, Trophy } from 'lucide-react'
+
+import type { Player } from '@/lib/types'
+
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
 
 interface PlayerListProps {
   players: Player[]
@@ -26,7 +28,7 @@ export function PlayerList({ players, currentUserId }: PlayerListProps) {
               <div className="flex items-center gap-2 mb-0.5">
                 <p className="font-semibold truncate">
                   {player.name}
-                  {player.id === currentUserId && " (You)"}
+                  {player.id === currentUserId && ' (You)'}
                 </p>
                 {player.isCreator && <Crown className="h-4 w-4 text-accent flex-shrink-0" />}
               </div>

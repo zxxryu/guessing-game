@@ -1,12 +1,15 @@
-"use client"
+'use client'
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { RoomCard } from "@/components/room-card"
-import { JoinRoomDialog } from "@/components/join-room-dialog"
-import type { Room } from "@/lib/types"
-import { RefreshCw, Gamepad2 } from "lucide-react"
+import { RefreshCw, Gamepad2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+
+import type { Room } from '@/lib/types'
+
+import { JoinRoomDialog } from '@/components/join-room-dialog'
+import { RoomCard } from '@/components/room-card'
+import { Button } from '@/components/ui/button'
+import { api } from '@/lib/api'
 
 export default function HomePage() {
   const [rooms, setRooms] = useState<Room[]>([])
@@ -15,11 +18,10 @@ export default function HomePage() {
 
   const fetchRooms = async () => {
     try {
-      const response = await fetch("/api/rooms")
-      const data = await response.json()
-      setRooms(data.rooms || [])
+      const rooms: Room[] = await api.listRooms(true)
+      setRooms(rooms)
     } catch (error) {
-      console.error("Failed to fetch rooms:", error)
+      console.error('Failed to fetch rooms:', error)
     } finally {
       setLoading(false)
     }
@@ -27,8 +29,6 @@ export default function HomePage() {
 
   useEffect(() => {
     fetchRooms()
-    const interval = setInterval(fetchRooms, 5000) // Refresh every 5 seconds
-    return () => clearInterval(interval)
   }, [])
 
   return (
@@ -59,7 +59,7 @@ export default function HomePage() {
             disabled={loading}
             className="rounded-full w-10 h-10 p-0"
           >
-            <RefreshCw className={`h-5 w-5 ${loading ? "animate-spin" : ""}`} />
+            <RefreshCw className={`h-5 w-5 ${loading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
 
@@ -75,7 +75,7 @@ export default function HomePage() {
             </div>
             <p className="text-lg font-medium mb-2">No rooms yet</p>
             <p className="text-muted-foreground mb-6">Be the first to create a game room</p>
-            <Button onClick={() => router.push("/create")} size="lg" className="rounded-full">
+            <Button onClick={() => router.push('/create')} size="lg" className="rounded-full">
               Create Room
             </Button>
           </div>

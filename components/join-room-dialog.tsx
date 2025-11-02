@@ -1,7 +1,10 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { LogIn } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -10,27 +13,29 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useToast } from "@/hooks/use-toast"
-import { LogIn } from "lucide-react"
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useUser } from '@/contexts/user-context'
+import { useToast } from '@/hooks/use-toast'
+import { api } from '@/lib/api'
 
 export function JoinRoomDialog() {
   const [open, setOpen] = useState(false)
-  const [roomId, setRoomId] = useState("")
-  const [password, setPassword] = useState("")
+  const [roomId, setRoomId] = useState('')
+  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
 
+  const { userId, setUserRoomPassword } = useUser()
+
   const handleJoin = async () => {
     if (!roomId.trim()) {
       toast({
-        title: "Error",
-        description: "Please enter a room ID",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Please enter a room ID',
+        variant: 'destructive',
       })
       return
     }
@@ -38,29 +43,25 @@ export function JoinRoomDialog() {
     setLoading(true)
 
     try {
-      const response = await fetch(`/api/room/${roomId}/join`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ roomId, password: password || undefined }),
-      })
-
-      const data = await response.json()
-
-      if (data.canJoin) {
+      const { canJoin, reason } = await api.joinRoom(roomId, userId || '', password || undefined);  
+      if (canJoin) {
+        if (password) {
+          setUserRoomPassword(roomId, password)
+        }
         router.push(`/room/${roomId}`)
         setOpen(false)
       } else {
         toast({
-          title: "Cannot join room",
-          description: data.reason || "Unknown error",
-          variant: "destructive",
+          title: 'Cannot join room',
+          description: reason || 'Unknown error',
+          variant: 'destructive',
         })
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to join room",
-        variant: "destructive",
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to join room',
+        variant: 'destructive',
       })
     } finally {
       setLoading(false)
@@ -114,7 +115,7 @@ export function JoinRoomDialog() {
             Cancel
           </Button>
           <Button onClick={handleJoin} disabled={loading} className="rounded-xl h-11 flex-1">
-            {loading ? "Joining..." : "Join Room"}
+            {loading ? 'Joining...' : 'Join Room'}
           </Button>
         </DialogFooter>
       </DialogContent>
