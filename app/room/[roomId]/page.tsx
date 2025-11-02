@@ -28,6 +28,7 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
   const [joined, setJoined] = useState(false)
   const [hasWon, setHasWon] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [currentPlayers, setCurrentPlayers] = useState(0)
   const [ws, setWs] = useState<WebSocket | null>(null)
   const [allGuesses, setAllGuesses] = useState<Guess[]>([])
   const [playerList, setPlayerList] = useState<Player[]>([])
@@ -43,7 +44,10 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
     setPlayerList(room.players)
   }, [room])
 
-
+  useEffect(() => {
+    if (!room) return
+    setCurrentPlayers(room.currentPlayers || playerList.length)
+  }, [room, playerList])
 
   useEffect(() => {
     if (!userId) return
@@ -57,9 +61,10 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
         if (msg.type === 'player_joined') {
           setPlayerList((prev) => [...prev, msg.data.player])
           room!.currentPlayers = msg.data.currentPlayers || playerList.length
+          setCurrentPlayers(msg.data.currentPlayers || playerList.length)
         } else if (msg.type === 'player_left') {
           setPlayerList((prev) => prev.filter((p) => p.id !== msg.data.player.id))
-          room!.currentPlayers = msg.data.currentPlayers || playerList.length
+          setCurrentPlayers(msg.data.currentPlayers || playerList.length)
         } else if (msg.type === 'guess_result') {
           const { status, winner, guess } = msg.data
           setHasWon(winner === userId)
@@ -209,7 +214,9 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
 
           {/* Middle & Right Columns - Game */}
           <div className="lg:col-span-2 space-y-4">
-            <GuessInput onGuess={handleGuess} disabled={room.status === 'finished' || !joined} digits={room.targetDigits} />
+            {room.status !== 'finished' && (
+              <GuessInput onGuess={handleGuess} disabled={!joined} digits={room.targetDigits} />
+            )}
             <AllGuessesHistory allGuesses={allGuesses} currentUserId={userId} targetDigits={room.targetDigits} />
           </div>
         </div>
