@@ -2,17 +2,18 @@
 
 import { Crown, Trophy } from 'lucide-react'
 
-import type { Player } from '@/lib/types'
+import type { Guess, Player } from '@/lib/types'
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 
 interface PlayerListProps {
   players: Player[]
+  guesses: Guess[]
   currentUserId: string
 }
 
-export function PlayerList({ players, currentUserId }: PlayerListProps) {
+export function PlayerList({ players, guesses, currentUserId }: PlayerListProps) {
   return (
     <div className="ios-card rounded-3xl p-5 shadow-sm">
       <h2 className="text-lg font-semibold mb-4">Players ({players.length})</h2>
@@ -30,9 +31,9 @@ export function PlayerList({ players, currentUserId }: PlayerListProps) {
                   {player.name}
                   {player.id === currentUserId && ' (You)'}
                 </p>
-                {player.isCreator && <Crown className="h-4 w-4 text-accent flex-shrink-0" />}
+                {player.id === currentUserId && <Crown className="h-4 w-4 text-accent flex-shrink-0" />}
               </div>
-              <p className="text-sm text-muted-foreground">{player.guesses.length} guesses</p>
+              <p className="text-sm text-muted-foreground">{guesses.filter(g => g.playerId === player.id).length} guesses</p>
             </div>
             {player.hasWon && (
               <Badge variant="default" className="flex-shrink-0 rounded-full">

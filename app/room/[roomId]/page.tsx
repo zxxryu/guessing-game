@@ -28,14 +28,14 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
   const [joined, setJoined] = useState(false)
   const [hasWon, setHasWon] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [currentPlayers, setCurrentPlayers] = useState(0)
+  const [currentPlayers, setCurrentPlayers] = useState<number>(0)
   const [ws, setWs] = useState<WebSocket | null>(null)
   const [allGuesses, setAllGuesses] = useState<Guess[]>([])
   const [playerList, setPlayerList] = useState<Player[]>([])
 
   useEffect(() => {
     if (!room) return
-    setAllGuesses(room.players.flatMap((p) => p.guesses))
+    setAllGuesses(room.guesses)
   }, [room])
 
 
@@ -51,40 +51,46 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
 
   useEffect(() => {
     if (!userId) return
-    loadRoom()
+    loadRoom().then(() => {
 
-    const socket = connectRoomSocket(
-      roomId,
-      userId,
-      (msg) => {
-        setJoined(msg.type === 'joined' || msg.type === 'already_joined')
-        if (msg.type === 'player_joined') {
-          setPlayerList((prev) => [...prev, msg.data.player])
-          room!.currentPlayers = msg.data.currentPlayers || playerList.length
-          setCurrentPlayers(msg.data.currentPlayers || playerList.length)
-        } else if (msg.type === 'player_left') {
-          setPlayerList((prev) => prev.filter((p) => p.id !== msg.data.player.id))
-          setCurrentPlayers(msg.data.currentPlayers || playerList.length)
-        } else if (msg.type === 'guess_result') {
-          const { status, winner, guess } = msg.data
-          setHasWon(winner === userId)
-          setAllGuesses((prev) => [...prev, guess])
-          room!.status = status
-        }
-      },
-      () => {
-        socket.send(JSON.stringify({ type: 'join', roomId, playerId: userId, playerName: userName }))
-      },
-    )
-
-    setWs(socket)
-    return () => socket.close()
-  }, [roomId, userId])
+      const socket = connectRoomSocket(
+        roomId,
+        userId,
+        (msg) => {
+          if (msg.type === 'player_joined') {
+            const { room } = msg.data;
+            if (room) {
+              setRoom(room)
+            }
+          } else if (msg.type === 'player_left') {
+            const { room } = msg.data;
+            if (room) {
+              setRoom(room)
+            }
+          } else if (msg.type === 'guess_result') {
+            const { room, winner } = msg.data
+            setHasWon(winner === userId)
+            if (room) {
+              setRoom(room)
+            }
+          } else if (msg.type === 'joined') {
+            setJoined(true)
+          }
+        },
+        () => {
+          socket.send(JSON.stringify({ type: 'join', roomId, playerId: userId, playerName: userName }))
+        },
+      )
+      setWs(socket)
+      return () => socket.close()
+    });
+  }, [userId, roomId])
 
 
   const loadRoom = async () => {
     try {
       const data = await api.getRoom(roomId, getUserRoomPassword(roomId))
+      console.log('Room data', data)
       setRoom(data)
       if (data.players.some((p) => p.id === userId)) {
         setJoined(true)
@@ -92,6 +98,7 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
       if (data.status === 'finished') {
         setHasWon(data.players.find((p) => p.id === userId && p.hasWon) !== undefined)
       }
+      return data;
     } catch (err) {
       toast({
         title: 'Room not found',
@@ -209,7 +216,7 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Left Column - Players */}
           <div className="lg:col-span-1">
-            <PlayerList players={playerList} currentUserId={userId} />
+            <PlayerList guesses={allGuesses} players={playerList} currentUserId={userId} />
           </div>
 
           {/* Middle & Right Columns - Game */}

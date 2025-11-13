@@ -11,13 +11,13 @@ export interface Room {
   targetNumber?: string
   targetDigits: number
   players: Player[]
+  guesses: Guess[]
   status: 'not_started' | 'playing' | 'finished'
 }
 
 export interface Player {
   id: string
   name: string
-  guesses: Guess[]
   hasWon: boolean
 }
 
@@ -32,17 +32,17 @@ export interface Guess {
 
 // WebSocket Message Types
 export type WSMessage =
-  | { type: 'join'; playerId: string; playerName: string; password?: string }
-  | { type: 'guess'; playerId: string; number: string }
+  | { type: 'join'; playerId: string; playerName: string; roomId: string; password?: string }
+  | { type: 'guess'; playerId: string; guess: string; roomId: string }
   | { type: 'leave'; playerId: string }
-  | { type: 'start'; playerId: string }
 
 export type WSResponse =
-  | { type: 'room-state'; room: Room }
-  | { type: 'player-joined'; player: Player }
-  | { type: 'player-left'; playerId: string }
-  | { type: 'guess-result'; playerId: string; guess: Guess }
-  | { type: 'game-won'; playerId: string; playerName: string }
+  | { type: 'room_state'; room: Room }
+  | { type: 'player_joined'; data: { connections: number; room: Room } }
+  | { type: 'joined'; data: { connections: number; room: Room } }
+  | { type: 'player_left'; data: { connections: number; room: Room } }
+  | { type: 'guess_update'; data: { room: Room; winner?: string | null; } }
+  | { type: 'guess_result'; data: { room: Room; winner?: string | null; } }
   | { type: 'error'; message: string }
 
 // API Response Types

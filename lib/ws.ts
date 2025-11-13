@@ -2,12 +2,11 @@ import type { Guess, Player, Room } from './types'
 
 export type MessageEventPayload =
   | { type: 'room_update'; data: Partial<Room> }
-  | { type: 'guess_update'; data: { status: Room['status'], winner?: string, guess: Guess } }
-  | { type: 'guess_result'; data: { status: Room['status'], winner?: string, guess: Guess } }
-  | { type: 'player_joined'; data: { currentPlayers: number, player: Player } }
-  | { type: 'joined'; data: { currentPlayers: number, player: Player } }
-  | { type: 'already_joined'; data: { currentPlayers: number, player: Player } }
-  | { type: 'player_left'; data: {  currentPlayers: number, player: Player } }
+  | { type: 'guess_update'; data: { room: Room, winner?: string } }
+  | { type: 'guess_result'; data: { room: Room, winner?: string } }
+  | { type: 'player_joined'; data: { connections: number, room: Room } }
+  | { type: 'joined'; data: { connections: number, room: Room } }
+  | { type: 'player_left'; data: { connections: number, room: Room } }
   | { type: 'error'; data: string }
 
 export function connectRoomSocket(
@@ -35,7 +34,8 @@ export function connectRoomSocket(
     try {
       const msg = JSON.parse(event.data)
       onMessage(msg)
-    } catch (_) {
+    } catch (e) {
+      console.error(e)
       console.warn('[WS] Invalid message', event.data)  
     }
   }
