@@ -13,6 +13,7 @@ interface RoomCardProps {
 export function RoomCard({ room }: RoomCardProps) {
   const router = useRouter()
   const isFull = room.currentPlayers >= room.maxPlayers
+  const isFinished = room.status === 'finished' ? true : false
 
   const handleJoin = () => {
     router.push(`/room/${room.id}`)
@@ -42,8 +43,8 @@ export function RoomCard({ room }: RoomCardProps) {
       </div>
 
       <div className="flex items-center justify-between gap-2">
-        <Badge variant={isFull ? 'secondary' : 'default'} className="rounded-full px-3 py-1">
-          {isFull ? 'Full' : 'Open'}
+        <Badge variant={isFinished ? 'destructive' : (isFull ? 'secondary' : 'default')} className="rounded-full px-3 py-1">
+          {isFinished ? 'Finished' : (isFull ? 'Full' : 'Open')}
         </Badge>
         <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
           <ChevronRight className="h-5 w-5 text-primary" />
