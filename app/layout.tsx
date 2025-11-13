@@ -7,6 +7,7 @@ import type React from 'react'
 import { IOSNav } from '@/components/ios-nav'
 import { UserProvider } from '@/contexts/user-context'
 import { AuthGate } from '@/components/auth-gate'
+import { Toaster } from '@/components/ui/toaster'
 
 import './globals.css'
 
@@ -46,6 +47,7 @@ export default function RootLayout({
             {children}
           </AuthGate>
           <IOSNav />
+          <Toaster />
         </UserProvider>
         <Analytics />
       </body>

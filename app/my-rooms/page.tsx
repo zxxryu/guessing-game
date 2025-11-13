@@ -10,7 +10,7 @@ import type React from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useUser } from '@/contexts/user-context'
-import { useToast } from '@/hooks/use-toast'
+import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 
 export default function MyRoomsPage() {

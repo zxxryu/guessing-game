@@ -12,7 +12,7 @@ import { PlayerList } from '@/components/player-list'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useUser } from '@/contexts/user-context'
-import { useToast } from '@/hooks/use-toast'
+import { useToast } from '@/components/ui/use-toast'
 import { api } from '@/lib/api'
 import { connectRoomSocket } from '@/lib/ws'
 
