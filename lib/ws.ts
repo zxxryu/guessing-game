@@ -20,6 +20,10 @@ export function connectRoomSocket(
 ) {
   const url = new URL(`${process.env.API_BASE}/room/${roomId}/ws`)
   url.searchParams.set('playerId', userId)
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('gg_token')
+    if (token) url.searchParams.set('token', token)
+  }
   url.protocol = url.protocol.replace('http', 'ws')
   const ws = new WebSocket(url.toString())
 

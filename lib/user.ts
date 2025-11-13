@@ -5,7 +5,13 @@ const USER_ROOMS_PASSWORD_KEY = 'guessing-game-user-rooms-password'
 
 export function getUserId(): string {
   if (typeof window === 'undefined') return ''
-
+  const authRaw = localStorage.getItem('gg_user')
+  if (authRaw) {
+    try {
+      const u = JSON.parse(authRaw)
+      if (u?.id) return u.id as string
+    } catch {}
+  }
   let userId = localStorage.getItem(USER_ID_KEY)
   if (!userId) {
     userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -16,7 +22,13 @@ export function getUserId(): string {
 
 export function getUserName(): string {
   if (typeof window === 'undefined') return ''
-
+  const authRaw = localStorage.getItem('gg_user')
+  if (authRaw) {
+    try {
+      const u = JSON.parse(authRaw)
+      if (u?.username) return u.username as string
+    } catch {}
+  }
   let userName = localStorage.getItem(USER_NAME_KEY)
   if (!userName) {
     userName = `Player${Math.floor(Math.random() * 9999)}`

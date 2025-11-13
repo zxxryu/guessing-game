@@ -2,12 +2,20 @@ import type { Room, Guess } from './types'
 
 const BASE_URL = process.env.API_BASE
 
+function getToken(): string | null {
+  if (typeof window === 'undefined') return null
+  return localStorage.getItem('gg_token')
+}
+
 async function request<T>(
   endpoint: string,
   options: RequestInit = {},
 ): Promise<T> {
   const res = await fetch(`${BASE_URL}${endpoint}`, {
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(getToken() ? { 'Authorization': `Bearer ${getToken()}` } : {}),
+    },
     ...options,
   })
   if (!res.ok) {
@@ -59,4 +67,17 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(guess),
     }),
+
+  // 认证
+  register: (username: string, password: string) =>
+    request<{ token: string, user: { id: string, username: string } }>(`/auth/register`, {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
+    }),
+  login: (username: string, password: string) =>
+    request<{ token: string, user: { id: string, username: string } }>(`/auth/login`, {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
+    }),
+  me: () => request<{ id: string, username: string }>(`/auth/me`, { method: 'GET' }),
 }
