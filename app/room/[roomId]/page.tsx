@@ -75,6 +75,12 @@ export default function RoomPage({ params }: { params: Promise<{ roomId: string 
             }
           } else if (msg.type === 'joined') {
             setJoined(true)
+          } else if (msg.type === 'error') {
+            toast({
+              title: 'Error',
+              description: msg.message,
+              variant: 'destructive',
+            })
           }
         },
         () => {

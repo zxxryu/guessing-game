@@ -7,7 +7,7 @@ export type MessageEventPayload =
   | { type: 'player_joined'; data: { connections: number, room: Room } }
   | { type: 'joined'; data: { connections: number, room: Room } }
   | { type: 'player_left'; data: { connections: number, room: Room } }
-  | { type: 'error'; data: string }
+  | { type: 'error'; message: string }
 
 export function connectRoomSocket(
   roomId: string,
