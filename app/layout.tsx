@@ -6,6 +6,7 @@ import type React from 'react'
 
 import { IOSNav } from '@/components/ios-nav'
 import { UserProvider } from '@/contexts/user-context'
+import { AuthGate } from '@/components/auth-gate'
 
 import './globals.css'
 
@@ -41,7 +42,9 @@ export default function RootLayout({
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="font-sans antialiased">
         <UserProvider>
-          {children}
+          <AuthGate>
+            {children}
+          </AuthGate>
           <IOSNav />
         </UserProvider>
         <Analytics />

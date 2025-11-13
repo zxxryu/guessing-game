@@ -12,12 +12,7 @@ export function getUserId(): string {
       if (u?.id) return u.id as string
     } catch {}
   }
-  let userId = localStorage.getItem(USER_ID_KEY)
-  if (!userId) {
-    userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-    localStorage.setItem(USER_ID_KEY, userId)
-  }
-  return userId
+  return ''
 }
 
 export function getUserName(): string {
@@ -29,17 +24,18 @@ export function getUserName(): string {
       if (u?.username) return u.username as string
     } catch {}
   }
-  let userName = localStorage.getItem(USER_NAME_KEY)
-  if (!userName) {
-    userName = `Player${Math.floor(Math.random() * 9999)}`
-    localStorage.setItem(USER_NAME_KEY, userName)
-  }
-  return userName
+  return ''
 }
 
 export function setUserName(name: string): void {
   if (typeof window === 'undefined') return
-  localStorage.setItem(USER_NAME_KEY, name)
+  const raw = localStorage.getItem('gg_user')
+  if (!raw) return
+  try {
+    const u = JSON.parse(raw)
+    u.username = name
+    localStorage.setItem('gg_user', JSON.stringify(u))
+  } catch {}
 }
 
 
